@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public Map<String, Map<String,String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
 
         ex.getBindingResult().getAllErrors().forEach((error) -> {
@@ -28,7 +28,9 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
-        return errors;
+        Map<String , Map<String,String>> finalError = new HashMap<>();
+        finalError.put("errors", errors);
+        return finalError;
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

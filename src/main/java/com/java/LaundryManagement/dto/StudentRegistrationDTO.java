@@ -1,9 +1,9 @@
 package com.java.LaundryManagement.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
+
 import java.time.LocalDate;
+
 import lombok.Data;
 
 @Data
@@ -16,6 +16,7 @@ public class StudentRegistrationDTO {
     private String fullName;
 
     @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "\\d{10}", message = "Phone number must be exactly 10 digits")
     private String phoneNumber;
 
     @NotBlank(message = "Room number is required")
@@ -32,5 +33,14 @@ public class StudentRegistrationDTO {
     private int totalWashesAllocated;
 
 
+    @AssertTrue(message = "Term end date must be after term start date")
+    public boolean isTermDatesValid() {
+
+        if (termStartDate == null || termEndDate == null) {
+            return true;
+        }
+
+        return termEndDate.isAfter(termStartDate);
+    }
 
 }
