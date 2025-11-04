@@ -11,6 +11,7 @@ import com.java.LaundryManagement.models.Student;
 import com.java.LaundryManagement.repositories.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.List;
 public class StudentServices {
 
     private final StudentRepository studentRepository;
-
+    @Transactional(readOnly = true)
     public List<StudentDTO> getAllStudents(){
         List<Student> students = studentRepository.findAll();
         List<StudentDTO> studentDTOS = new ArrayList<>();
@@ -31,7 +32,7 @@ public class StudentServices {
 
         return studentDTOS;
     }
-
+    @Transactional(readOnly = true)
     public StudentDTO getStudentById(String registrationNo){
         Student student = studentRepository.findById(registrationNo)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -40,7 +41,7 @@ public class StudentServices {
         return StudentDTO.studentDTO(student);
     }
 
-
+    @Transactional
     public StudentDTO createStudent(StudentRegistrationDTO studentRegistrationDTO){
         if(studentRepository.existsById(studentRegistrationDTO.getRegistrationNo())){
             throw new UserAlreadyExistsException("Student with username " + studentRegistrationDTO.getRegistrationNo() + " already exists");
@@ -59,7 +60,7 @@ public class StudentServices {
         return StudentDTO.studentDTO(student);
     }
 
-
+    @Transactional
     public StudentDTO updateStudent(String registrationNo, UpdateStudentDTO updateStudentDTO){
 
         if(!registrationNo.equals(updateStudentDTO.getRegistrationNo())){
@@ -83,6 +84,7 @@ public class StudentServices {
         return StudentDTO.studentDTO(student);
     }
 
+    @Transactional
     public StudentDTO deleteStudent(String registrationNo){
         Student student = studentRepository.findById(registrationNo)
                 .orElseThrow(() -> new ResourceNotFoundException(

@@ -11,6 +11,7 @@ import com.java.LaundryManagement.repositories.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
-
+    @Transactional(readOnly = true)
     public List<EmployeeDTO> getALlEmployee() {
         List<Employee> employees = employeeRepository.findAll();
         List<EmployeeDTO> employeeDTOS = new ArrayList<>();
@@ -33,7 +34,7 @@ public class EmployeeService {
 
         return employeeDTOS;
     }
-
+    @Transactional
     public EmployeeDTO createEmployee(EmployeeRegistationDTO employeeRegistationDTO) throws UserAlreadyExistsException {
         if(employeeRepository.existsById(employeeRegistationDTO.getUsername())){
             throw new UserAlreadyExistsException("User Already Exists");
@@ -51,7 +52,7 @@ public class EmployeeService {
 
         return EmployeeDTO.mapEmployeeDTO(employee);
     }
-
+    @Transactional(readOnly = true)
     public EmployeeDTO getEmployeeById(String username) throws ResourceNotFoundException {
         Employee employee = employeeRepository.findById(username)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -60,7 +61,7 @@ public class EmployeeService {
 
         return EmployeeDTO.mapEmployeeDTO(employee);
     }
-
+    @Transactional
     public EmployeeDTO upsertEmployee(String username, UpdateEmployeeDTO updateEmployeeDTO)throws InvalidRequest,ResourceNotFoundException {
 
 
@@ -79,6 +80,8 @@ public class EmployeeService {
         employee = employeeRepository.save(employee);
         return EmployeeDTO.mapEmployeeDTO(employee);
     }
+
+    @Transactional
     public EmployeeDTO deleteEmployee(String username) throws ResourceNotFoundException {
         Employee employee = employeeRepository.findById(username)
                 .orElseThrow(() -> new ResourceNotFoundException(

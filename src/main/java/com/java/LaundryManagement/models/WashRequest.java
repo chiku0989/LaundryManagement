@@ -3,7 +3,6 @@ package com.java.LaundryManagement.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.apache.catalina.User;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -28,6 +27,9 @@ public class WashRequest {
     @Column(nullable = false, updatable = false)
     private LocalDateTime dateRequested;
     private LocalDateTime datePickedUp;
+
+    @Column(nullable = false)
+    private int ClothCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
