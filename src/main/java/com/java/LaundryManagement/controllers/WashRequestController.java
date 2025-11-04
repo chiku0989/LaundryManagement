@@ -32,13 +32,13 @@ public class WashRequestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(washRequestDTO);
     }
 
-    @GetMapping("/{studentRegistrationNumber}")
+    @GetMapping("/student/{studentRegistrationNumber}")
     public ResponseEntity<List<WashRequestDTO>> getWashRequestByStudenRegistationNumber(@PathVariable String studentRegistrationNumber) {
         List<WashRequestDTO> washRequestDTOS = washRequestService.getStudentWashRequests(studentRegistrationNumber);
         return ResponseEntity.status(HttpStatus.OK).body(washRequestDTOS);
     }
 
-    @GetMapping("/{status}")
+    @GetMapping("/status/{status}")
     public ResponseEntity<List<WashRequestDTO>> getWashRequestByStudenRegistationNumber(@PathVariable WashStatus status) {
         List<WashRequestDTO> washRequestDTOS = washRequestService.getWashRequestsByStatus(status);
         return ResponseEntity.status(HttpStatus.OK).body(washRequestDTOS);
