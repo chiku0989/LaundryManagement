@@ -6,8 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 
 @Entity
@@ -16,7 +21,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 
-public class Employee {
+public class Employee implements UserDetails {
 
     @Id
     private String username;
@@ -35,4 +40,8 @@ public class Employee {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+    }
 }

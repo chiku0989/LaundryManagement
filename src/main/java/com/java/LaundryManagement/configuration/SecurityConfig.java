@@ -1,31 +1,31 @@
 package com.java.LaundryManagement.configuration;
 
+import com.java.LaundryManagement.exception.ResourceNotFoundException;
+import com.java.LaundryManagement.filters.JWTFilter;
 import com.java.LaundryManagement.filters.RequestLoggingFilter;
+
+import com.java.LaundryManagement.repositories.EmployeeRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-
+    private final CustomAuthEntryPoint customAuthEntryPoint;
     private final RequestLoggingFilter requestLoggingFilter;
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    private final JWTFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -35,24 +35,23 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-                        })
+                        .authenticationEntryPoint(customAuthEntryPoint) // <-- 2. Use it here
                 )
 
 
                 .authorizeHttpRequests( auth -> auth
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/students").permitAll()
-                        .requestMatchers("/students/**").permitAll()
-                        .requestMatchers("/employees").permitAll()
-                        .requestMatchers("/employees/**").permitAll()
-                        .requestMatchers("/**").permitAll()
+                        .requestMatchers("/students").hasAnyRole("STAFF", "ADMIN")
+                        .requestMatchers("/students/**").hasAnyRole("STAFF", "ADMIN")
+                        .requestMatchers("/employees").hasRole("ADMIN")
+                        .requestMatchers("/employees/**").hasRole("ADMIN")
+                        .requestMatchers("/**").hasAnyRole("STAFF", "ADMIN")
                         .anyRequest().authenticated()
                 );
 
-        http.addFilterBefore(requestLoggingFilter, UsernamePasswordAuthenticationFilter.class);
 
+        http.addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(requestLoggingFilter, JWTFilter.class);
         return http.build();
     }
 }
