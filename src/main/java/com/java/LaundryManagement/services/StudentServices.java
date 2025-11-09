@@ -64,7 +64,7 @@ public class StudentServices {
         String templateName = "welcome_student";
         String languageCode = "en";
 
-        List<String> Params = List.of(studentRegistrationDTO.getFullName(), studentRegistrationDTO.getRoomNumber(), studentRegistrationDTO.getRoomNumber(), ""+studentRegistrationDTO.getTotalWashesAllocated());
+        List<String> Params = List.of(studentRegistrationDTO.getFullName(), studentRegistrationDTO.getRegistrationNo(), studentRegistrationDTO.getRoomNumber(), ""+studentRegistrationDTO.getTotalWashesAllocated());
 
 
         whatsAppService.sendTemplateMessage(PhoneNumber, templateName, languageCode, Params);

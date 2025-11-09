@@ -58,7 +58,7 @@ public class WashRequestService {
         String templateName = "wash_registered";
         String languageCode = "en";
 
-        List<String> Params = List.of(student.getFullName(), student.getRoomNumber(), ""+LocalDate.now(), "PENDING" ,""+student.getRemainingWashes());
+        List<String> Params = List.of(student.getFullName(), student.getRegistrationNo(), ""+LocalDate.now(), "PENDING" ,""+student.getRemainingWashes());
         WashRequest washRequest = new WashRequest();
         washRequest.setStudent(student);
         washRequest.setClothCount(washRequestRegistrationDTO.getClothCount());
