@@ -1,4 +1,5 @@
 package com.java.LaundryManagement.services;
+import com.java.LaundryManagement.dto.StudentRegistrationDTO;
 import com.java.LaundryManagement.dto.UpdateWashRequestStatusDTO;
 import com.java.LaundryManagement.dto.WashRequestDTO;
 import com.java.LaundryManagement.dto.WashRequestRegistrationDTO;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +26,7 @@ public class WashRequestService {
 
     private final StudentRepository studentRepository;
     private final WashRequestRepository washRequestRepository;
-
+    private final  WhatsAppService whatsAppService;
     @Transactional(readOnly = true)
     public List<WashRequestDTO> getAllWashRequests() {
         List<WashRequest>  washRequests = washRequestRepository.findAll();
@@ -52,6 +54,11 @@ public class WashRequestService {
             studentRepository.save(student);
         }
 
+        String PhoneNumber = "91"+student.getPhoneNumber();
+        String templateName = "wash_registered";
+        String languageCode = "en";
+
+        List<String> Params = List.of(student.getFullName(), student.getRoomNumber(), ""+LocalDate.now(), "PENDING" ,""+student.getRemainingWashes());
         WashRequest washRequest = new WashRequest();
         washRequest.setStudent(student);
         washRequest.setClothCount(washRequestRegistrationDTO.getClothCount());
@@ -59,7 +66,7 @@ public class WashRequestService {
 
         washRequest = washRequestRepository.save(washRequest);
 
-
+        whatsAppService.sendTemplateMessage(PhoneNumber, templateName, languageCode, Params);
         return WashRequestDTO.toDTO(washRequest);
     }
 
@@ -120,6 +127,13 @@ public class WashRequestService {
         washRequest.setStatus(updateWashRequestStatusDTO.getStatus());
         washRequest = washRequestRepository.save(washRequest);
 
+        Student student = washRequest.getStudent();
+
+        String PhoneNumber = "91"+student.getPhoneNumber();
+        String templateName = "wash_status_update";
+        String languageCode = "en";
+        List<String> Params = List.of(student.getFullName(), student.getRegistrationNo(), washRequest.getStatus().name(),washRequest.getStatus().name());
+        whatsAppService.sendTemplateMessage(PhoneNumber, templateName, languageCode, Params);
         return WashRequestDTO.toDTO(washRequest);
     }
 }

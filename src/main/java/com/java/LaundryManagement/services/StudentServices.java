@@ -1,5 +1,6 @@
 package com.java.LaundryManagement.services;
 
+import com.java.LaundryManagement.dto.Language;
 import com.java.LaundryManagement.dto.StudentDTO;
 import com.java.LaundryManagement.dto.StudentRegistrationDTO;
 import com.java.LaundryManagement.dto.UpdateStudentDTO;
@@ -21,6 +22,7 @@ import java.util.List;
 public class StudentServices {
 
     private final StudentRepository studentRepository;
+    private final WhatsAppService whatsAppService;
     @Transactional(readOnly = true)
     public List<StudentDTO> getAllStudents(){
         List<Student> students = studentRepository.findAll();
@@ -57,6 +59,15 @@ public class StudentServices {
         student.setTotalWashesAllocated(studentRegistrationDTO.getTotalWashesAllocated());
         student.setRemainingWashes(studentRegistrationDTO.getTotalWashesAllocated());
         student = studentRepository.save(student);
+
+        String PhoneNumber = "91"+studentRegistrationDTO.getPhoneNumber();
+        String templateName = "welcome_student";
+        String languageCode = "en";
+
+        List<String> Params = List.of(studentRegistrationDTO.getFullName(), studentRegistrationDTO.getRoomNumber(), studentRegistrationDTO.getRoomNumber(), ""+studentRegistrationDTO.getTotalWashesAllocated());
+
+
+        whatsAppService.sendTemplateMessage(PhoneNumber, templateName, languageCode, Params);
         return StudentDTO.studentDTO(student);
     }
 
